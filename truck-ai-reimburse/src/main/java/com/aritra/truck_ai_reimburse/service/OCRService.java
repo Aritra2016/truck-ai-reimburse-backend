@@ -16,29 +16,28 @@ public class OCRService {
 
     public OCRService() {
         tesseract = new Tesseract();
-        tesseract.setDatapath("src/main/resources/tessdata"); // tessdata folder
+
+        // ✅ ONLY THIS PATH (NO src/main/resources)
+        tesseract.setDatapath("C:/Program Files/Tesseract-OCR/tessdata");
         tesseract.setLanguage("eng");
+
+        tesseract.setTessVariable("user_defined_dpi", "300");
     }
 
     public String extractText(MultipartFile file) {
         try {
-            File imageFile = convert(file);
-            String extractedText = tesseract.doOCR(imageFile);
-            log.info("OCR extracted text: {}", extractedText);
-            return extractedText;
+            File tempFile = File.createTempFile("ocr-", file.getOriginalFilename());
+            file.transferTo(tempFile);
+
+            String text = tesseract.doOCR(tempFile);
+            tempFile.delete();
+
+            log.info("OCR extracted text:\n{}", text);
+            return text;
+
         } catch (Exception e) {
             log.error("OCR failed", e);
-            throw new RuntimeException("Failed to extract text from document");
+            return "";
         }
     }
-
-    private File convert(MultipartFile file) throws IOException {
-        File convFile = new File(
-                System.getProperty("java.io.tmpdir") + "/" + file.getOriginalFilename()
-        );
-        file.transferTo(convFile);
-        return convFile;
-    }
-
-
 }

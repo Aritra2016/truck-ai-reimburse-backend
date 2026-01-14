@@ -5,6 +5,7 @@ import com.aritra.truck_ai_reimburse.Domain.ChatRequest;
 import com.aritra.truck_ai_reimburse.Domain.ChatResponse;
 import com.aritra.truck_ai_reimburse.service.ChatbotService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,20 +13,22 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
 public class ChatController {
-
     private final ChatbotService chatbotService;
-
     @PostMapping("/chatting")
     public ChatResponse handleMessage(@RequestBody ChatRequest request){
       return chatbotService.processMessage(request);
     }
 
-    @PostMapping("/uploadbill")
+    @PostMapping(
+            value = "/upload-bill",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ChatResponse uploadBill(
-            @RequestParam MultipartFile file,
-            @RequestParam(required = false) String sessionId
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "sessionId", required = false) String sessionId
     ) {
         return chatbotService.processBillUpload(file, sessionId);
     }
+
 
 }

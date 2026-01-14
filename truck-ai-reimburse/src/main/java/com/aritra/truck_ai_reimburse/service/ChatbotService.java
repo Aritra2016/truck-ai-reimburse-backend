@@ -4,6 +4,7 @@ import com.aritra.truck_ai_reimburse.DTOs.ChatMessageDTO;
 import com.aritra.truck_ai_reimburse.Domain.ChatRequest;
 import com.aritra.truck_ai_reimburse.Domain.ChatResponse;
 import com.aritra.truck_ai_reimburse.enums.ChatIntent;
+import com.aritra.truck_ai_reimburse.exception.DocumentProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class ChatbotService {
 
     private final OCRService ocrService;
     private final BillExtractionService billExtractionService;
+    private final PdfTextService pdfTextService;
 
     public ChatResponse processMessage(ChatRequest request) {
         // 1. Generate sessionId if missing
@@ -60,30 +62,61 @@ public class ChatbotService {
                 "NONE"
         );
     }
-    public ChatResponse processBillUpload(MultipartFile file, String sessionId) {
-
-        if (sessionId == null) {
+    public ChatResponse processBillUpload(MultipartFile file, String sessionId) throws DocumentProcessingException {
+        if (sessionId == null || sessionId.isBlank()) {
             sessionId = UUID.randomUUID().toString();
         }
 
-        String extractedText = ocrService.extractText(file);
+        String filename = file.getOriginalFilename();
+        if (filename == null) {
+            throw new DocumentProcessingException("Invalid file");
+        }
+        filename = filename.toLowerCase();
 
-        log.info("========== OCR TEXT START ==========");
+        if (!filename.endsWith(".jpg") &&
+                !filename.endsWith(".jpeg") &&
+                !filename.endsWith(".png") &&
+                !filename.endsWith(".pdf")) {
+            throw new DocumentProcessingException("Unsupported file type");
+        }
+
+        String extractedText;
+        if (filename.endsWith(".pdf")) {
+            extractedText = pdfTextService.extractText(file);
+        } else {
+            extractedText = ocrService.extractText(file);
+        }
+
+        if (extractedText == null || extractedText.isBlank()) {
+            throw new DocumentProcessingException("No readable text found in document");
+        }
+
+        log.info("===== OCR / PDF TEXT =====");
         log.info(extractedText);
-        log.info("========== OCR TEXT END ==========");
 
         Map<String, String> billData =
                 billExtractionService.extractFields(extractedText);
 
-        String category = billData.getOrDefault("category", "UNKNOWN");
-        String amount = billData.getOrDefault("amount", "100");
+        if (billData.isEmpty()
+                || billData.get("amount") == null
+                || billData.get("category") == null) {
+
+            return new ChatResponse(
+                    sessionId,
+                    "❌ This document does not look like a valid expense receipt. " +
+                            "Please upload a fuel, toll, or parking bill with a visible amount.",
+                    "UPLOAD_AGAIN"
+            );
+        }
 
         return new ChatResponse(
                 sessionId,
-                "I found a " + category +
-                        " expense of ₹" + amount +
+                "✅ I found a " + billData.get("category") +
+                        " expense of ₹" + billData.get("amount") +
                         ". Please confirm.",
                 "CONFIRM_BILL"
         );
+
+        }
+
     }
-}

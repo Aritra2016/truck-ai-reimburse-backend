@@ -13,39 +13,27 @@ public class BillExtractionService {
     public Map<String, String> extractFields(String text) {
 
         Map<String, String> data = new HashMap<>();
+        String lower = text.toLowerCase();
 
-        if (text == null || text.isBlank()) {
-            return data;
-        }
-
-        String lowerText = text.toLowerCase();
-
-        // ---------- CATEGORY ----------
-        if (lowerText.contains("fuel")) {
-            data.put("category", "FUEL");
-        } else if (lowerText.contains("toll")) {
-            data.put("category", "TOLL");
-        } else if (lowerText.contains("tablet")
-                || lowerText.contains("medicine")
-                || lowerText.contains("gluco")) {
-            data.put("category", "MEDICAL");
-        } else {
-            data.put("category", "OTHER");
-        }
-
-        // ---------- AMOUNT ----------
+        // ✅ AMOUNT (₹, rs, total, amount)
         Pattern amountPattern = Pattern.compile(
-                "(rs\\.?|inr|₹)\\s*(\\d+(\\.\\d{1,2})?)",
-                Pattern.CASE_INSENSITIVE
+                "(₹|rs\\.?|inr)?\\s*([0-9]{2,6}(\\.\\d{1,2})?)"
         );
+        Matcher amountMatcher = amountPattern.matcher(lower);
 
-        Matcher matcher = amountPattern.matcher(text);
+        if (amountMatcher.find()) {
+            data.put("amount", amountMatcher.group(2));
+        }
 
-        if (matcher.find()) {
-            data.put("amount", matcher.group(2));
+        // ✅ CATEGORY
+        if (lower.contains("fuel") || lower.contains("petrol") || lower.contains("diesel")) {
+            data.put("category", "FUEL");
+        } else if (lower.contains("toll")) {
+            data.put("category", "TOLL");
+        } else if (lower.contains("parking")) {
+            data.put("category", "PARKING");
         }
 
         return data;
     }
-
 }
