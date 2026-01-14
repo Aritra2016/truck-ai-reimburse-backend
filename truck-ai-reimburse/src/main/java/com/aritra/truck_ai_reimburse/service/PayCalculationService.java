@@ -2,7 +2,10 @@ package com.aritra.truck_ai_reimburse.service;
 
 import com.aritra.truck_ai_reimburse.Domain.PayStatement;
 import com.aritra.truck_ai_reimburse.Domain.Trip;
+import com.aritra.truck_ai_reimburse.repository.ExpenseRepository;
+import com.aritra.truck_ai_reimburse.repository.PayRuleRepository;
 import com.aritra.truck_ai_reimburse.repository.PayStatementRepository;
+import com.aritra.truck_ai_reimburse.repository.TripRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,10 +22,19 @@ import java.time.LocalDateTime;
 public class PayCalculationService {
 
     private static final Logger log = LoggerFactory.getLogger(PayCalculationService.class);
-    private final PayStatementRepository payStatementRepository;
 
-    public PayCalculationService(PayStatementRepository payStatementRepository) {
+    private final PayStatementRepository payStatementRepository;
+    private final TripRepository tripRepository;
+    private final ExpenseRepository expenseRepository;
+    private final PayRuleRepository payRuleRepository;
+    private final LedgerService ledgerService;
+
+    public PayCalculationService(PayStatementRepository payStatementRepository, TripRepository tripRepository, ExpenseRepository expenseRepository, PayRuleRepository payRuleRepository, LedgerService ledgerService) {
         this.payStatementRepository = payStatementRepository;
+        this.tripRepository = tripRepository;
+        this.expenseRepository = expenseRepository;
+        this.payRuleRepository = payRuleRepository;
+        this.ledgerService = ledgerService;
     }
 
     @Transactional

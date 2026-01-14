@@ -103,7 +103,7 @@ public class ChatbotService {
 
             return new ChatResponse(
                     sessionId,
-                    "❌ This document does not look like a valid expense receipt. " +
+                    " This document does not look like a valid expense receipt. " +
                             "Please upload a fuel, toll, or parking bill with a visible amount.",
                     "UPLOAD_AGAIN"
             );
@@ -111,7 +111,7 @@ public class ChatbotService {
 
         return new ChatResponse(
                 sessionId,
-                "✅ I found a " + billData.get("category") +
+                "I found a " + billData.get("category") +
                         " expense of ₹" + billData.get("amount") +
                         ". Please confirm.",
                 "CONFIRM_BILL"

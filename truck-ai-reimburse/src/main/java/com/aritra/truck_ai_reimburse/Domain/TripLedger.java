@@ -21,12 +21,33 @@ public class TripLedger {
     @ManyToOne(fetch = FetchType.LAZY)
     private Trip trip;
 
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
+    }
+
     private String eventType; // PAY_CALCULATED, EXPENSE_ADDED, PAYOUT_DONE
 
     @Column(columnDefinition = "TEXT")
     private String eventDetails;
 
     private LocalDateTime eventTime;
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    private String remarks;
+
+    private LocalDateTime createdAt;
+
 
     public Long getId() {
         return id;

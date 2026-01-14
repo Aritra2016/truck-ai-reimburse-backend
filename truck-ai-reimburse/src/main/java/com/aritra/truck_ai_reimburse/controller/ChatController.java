@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class ChatController {
     private final ChatbotService chatbotService;
+
     @PostMapping("/chatting")
     public ChatResponse handleMessage(@RequestBody ChatRequest request){
       return chatbotService.processMessage(request);
