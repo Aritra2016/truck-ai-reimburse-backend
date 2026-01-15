@@ -1,7 +1,9 @@
 package com.aritra.truck_ai_reimburse.service;
 
+import com.aritra.truck_ai_reimburse.Domain.LedgerEvents;
 import com.aritra.truck_ai_reimburse.Domain.PayStatement;
 import com.aritra.truck_ai_reimburse.Domain.Trip;
+import com.aritra.truck_ai_reimburse.enums.TripStatus;
 import com.aritra.truck_ai_reimburse.repository.ExpenseRepository;
 import com.aritra.truck_ai_reimburse.repository.PayRuleRepository;
 import com.aritra.truck_ai_reimburse.repository.PayStatementRepository;
@@ -25,45 +27,49 @@ public class PayCalculationService {
 
     private final PayStatementRepository payStatementRepository;
     private final TripRepository tripRepository;
-    private final ExpenseRepository expenseRepository;
-    private final PayRuleRepository payRuleRepository;
+   // private final ExpenseRepository expenseRepository;
+   // private final PayRuleRepository payRuleRepository;
     private final LedgerService ledgerService;
 
     public PayCalculationService(PayStatementRepository payStatementRepository, TripRepository tripRepository, ExpenseRepository expenseRepository, PayRuleRepository payRuleRepository, LedgerService ledgerService) {
         this.payStatementRepository = payStatementRepository;
         this.tripRepository = tripRepository;
-        this.expenseRepository = expenseRepository;
-        this.payRuleRepository = payRuleRepository;
+      //  this.expenseRepository = expenseRepository;
+      //  this.payRuleRepository = payRuleRepository;
         this.ledgerService = ledgerService;
     }
 
     @Transactional
-    public PayStatement calculatePay(Trip trip) {
+    public PayStatement calculatePay(Long id) {
 
-        log.info("Starting pay calculation for tripId={}", trip.getId());
+        Trip trip = tripRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Trip not found"));
 
-        // Mock calculation logic (replace later with rule engine)
-        BigDecimal grossPay = BigDecimal.valueOf(1500);
-        BigDecimal deductions = BigDecimal.valueOf(200);
-        BigDecimal netPay = grossPay.subtract(deductions);
+        if (trip.getStatus() != String.valueOf(TripStatus.POD_VERIFIED)) {
+            throw new IllegalStateException("POD not verified");
+        }
 
-        
+        // calculation logic (already discussed)
+        BigDecimal totalPay = BigDecimal.valueOf(1000);
+
         PayStatement statement = PayStatement.builder()
-                .statementNumber("PS-" + System.currentTimeMillis())
-                .driver(trip.getDriver())
                 .trip(trip)
-                .grossPay(grossPay)
-                .deductions(deductions)
-                .netPay(netPay)
-                .generatedAt(LocalDateTime.now())
+                .totalAmount(totalPay)
+                .status("CALCULATED")
                 .build();
 
-        PayStatement savedStatement = payStatementRepository.save(statement);
+        payStatementRepository.save(statement);
 
-        log.info("Pay calculation completed. StatementNumber={}, NetPay={}",
-                savedStatement.getStatementNumber(),
-                savedStatement.getNetPay());
+        trip.setStatus(String.valueOf(TripStatus.PAY_CALCULATED));
+        tripRepository.save(trip);
 
-        return savedStatement;
+        ledgerService.recordEvent(
+                trip,
+                LedgerEvents.PAY_CALCULATED,
+                "Pay calculated",
+                "TotalPay=" + totalPay
+        );
+
+        return statement;
     }
 }

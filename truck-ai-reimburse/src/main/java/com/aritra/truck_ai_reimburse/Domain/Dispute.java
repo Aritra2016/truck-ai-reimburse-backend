@@ -18,15 +18,13 @@ public class Dispute {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String disputeType; // PAY, EXPENSE, DETENTION
-
     @Column(columnDefinition = "TEXT")
     private String reason;
-
     private String status; // OPEN, IN_PROGRESS, RESOLVED
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id")
     private Driver driver;
 
     private LocalDateTime createdAt;

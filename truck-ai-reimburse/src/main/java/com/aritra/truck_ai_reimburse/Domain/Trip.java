@@ -1,8 +1,10 @@
 package com.aritra.truck_ai_reimburse.Domain;
 
+import com.aritra.truck_ai_reimburse.enums.TripStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,7 +16,7 @@ public class Trip {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long trip_id;
 
     @Column(nullable = false, unique = true)
     private String tripNumber;
@@ -30,15 +32,35 @@ public class Trip {
     private LocalDateTime pickupTime;
     private LocalDateTime deliveryTime;
 
-    private String status; // PLANNED, IN_TRANSIT, COMPLETED
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TripStatus tripstatus;
+    private  String status;
+    // PLANNED, IN_TRANSIT, COMPLETED
+    private BigDecimal totalAmount;
 
-
-    public Long getId() {
-        return id;
+    public BigDecimal getTotalAmount() {
+        return totalAmount;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setTotalAmount(BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public Long getTrip_id() {
+        return trip_id;
+    }
+
+    public void setTrip_id(Long trip_id) {
+        this.trip_id = trip_id;
+    }
+
+    public TripStatus getTripstatus() {
+        return tripstatus;
+    }
+
+    public void setTripstatus(TripStatus tripstatus) {
+        this.tripstatus = tripstatus;
     }
 
     public String getTripNumber() {

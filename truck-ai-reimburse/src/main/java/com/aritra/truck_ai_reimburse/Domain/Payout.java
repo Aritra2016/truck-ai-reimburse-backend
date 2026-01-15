@@ -16,20 +16,47 @@ public class Payout {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String payoutRef;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Driver driver;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trip_id")
+    private Trip trip;
 
     private BigDecimal amount;
     private String currency;
-
     private String payoutMethod; // ACH, RTP, CARD, EFT
-
     private String status; // INITIATED, SUCCESS, FAILED
-
     private LocalDateTime processedAt;
+    private String transactionRef;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pay_statement_id", nullable = false)
+    private PayStatement payStatement;
+
+    public Trip getTrip() {
+        return trip;
+    }
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
+
+    public PayStatement getPayStatement() {
+        return payStatement;
+    }
+
+    public void setPayStatement(PayStatement payStatement) {
+        this.payStatement = payStatement;
+    }
+
+    public String getTransactionRef() {
+        return transactionRef;
+    }
+
+    public void setTransactionRef(String transactionRef) {
+        this.transactionRef = transactionRef;
+    }
 
     public Long getId() {
         return id;

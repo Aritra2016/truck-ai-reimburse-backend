@@ -18,6 +18,6 @@ public class PayStatementController {
 
     @PostMapping("/calculate")
     public PayStatement calculatePay(@RequestBody Trip trip) {
-        return payCalculationService.calculatePay(trip);
+        return payCalculationService.calculatePay(trip.getTrip_id());
     }
 }

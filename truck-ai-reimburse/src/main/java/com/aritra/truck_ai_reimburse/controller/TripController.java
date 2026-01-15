@@ -3,6 +3,7 @@ package com.aritra.truck_ai_reimburse.controller;
 import com.aritra.truck_ai_reimburse.Domain.Trip;
 import com.aritra.truck_ai_reimburse.service.TripService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,13 +20,18 @@ public class TripController {
         return tripService.saveTrip(trip);
     }
 
+    @PostMapping("/trips/{id}/complete")
+    public ResponseEntity<Trip> completeTrip(@PathVariable Long id) {
+        return ResponseEntity.ok(tripService.completeTrip(id));
+    }
+
     @GetMapping("/driver/{driverId}")
     public List<Trip> getTripsByDriver(@PathVariable Long driverId) {
         return tripService.getTripsByDriver(driverId);
     }
 
     @PutMapping("/{tripId}/complete")
-    public Trip completeTrip(@PathVariable Long tripId) {
+    public Trip updateTrip(@PathVariable Long tripId) {
         return tripService.completeTrip(tripId);
     }
 
