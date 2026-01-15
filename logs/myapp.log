@@ -555,3 +555,52 @@ This generated password is for development use only. Your security configuration
 2026-01-16T03:18:51.807+05:30 DEBUG 9196 --- [TruckAiReimburse] [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
 2026-01-16T03:18:52.242+05:30  INFO 9196 --- [TruckAiReimburse] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
 2026-01-16T03:18:52.266+05:30  INFO 9196 --- [TruckAiReimburse] [main] c.a.t.TruckAiReimburseApplication        : Started TruckAiReimburseApplication in 8.921 seconds (process running for 9.587)
+2026-01-16T03:32:56.707+05:30  INFO 9196 --- [TruckAiReimburse] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2026-01-16T03:32:57.044+05:30  INFO 9196 --- [TruckAiReimburse] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2026-01-16T03:32:57.129+05:30  INFO 9196 --- [TruckAiReimburse] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-01-16T03:32:57.257+05:30  INFO 9196 --- [TruckAiReimburse] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-01-16T03:32:57.428+05:30  INFO 9196 --- [TruckAiReimburse] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-01-16T03:33:04.145+05:30  INFO 5012 --- [TruckAiReimburse] [main] c.a.t.TruckAiReimburseApplication        : Starting TruckAiReimburseApplication using Java 17.0.16 with PID 5012 (C:\Users\aritr\Downloads\truck-ai-reimburse\truck-ai-reimburse\target\classes started by aritr in C:\Users\aritr\Downloads\truck-ai-reimburse)
+2026-01-16T03:33:04.149+05:30  INFO 5012 --- [TruckAiReimburse] [main] c.a.t.TruckAiReimburseApplication        : No active profile set, falling back to 1 default profile: "default"
+2026-01-16T03:33:06.323+05:30  INFO 5012 --- [TruckAiReimburse] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-01-16T03:33:06.454+05:30  INFO 5012 --- [TruckAiReimburse] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 120 ms. Found 14 JPA repository interfaces.
+2026-01-16T03:33:07.390+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8081 (http)
+2026-01-16T03:33:07.404+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-01-16T03:33:07.405+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-01-16T03:33:07.558+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-01-16T03:33:07.558+05:30  INFO 5012 --- [TruckAiReimburse] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3354 ms
+2026-01-16T03:33:07.875+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-01-16T03:33:08.015+05:30  INFO 5012 --- [TruckAiReimburse] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.39.Final
+2026-01-16T03:33:08.088+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-01-16T03:33:08.535+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-01-16T03:33:08.596+05:30  INFO 5012 --- [TruckAiReimburse] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-01-16T03:33:09.118+05:30  INFO 5012 --- [TruckAiReimburse] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@47ef5a33
+2026-01-16T03:33:09.120+05:30  INFO 5012 --- [TruckAiReimburse] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-01-16T03:33:09.224+05:30  INFO 5012 --- [TruckAiReimburse] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.40
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-01-16T03:33:11.230+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-01-16T03:33:11.599+05:30  INFO 5012 --- [TruckAiReimburse] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-01-16T03:33:12.107+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-01-16T03:33:13.020+05:30  WARN 5012 --- [TruckAiReimburse] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-16T03:33:13.318+05:30  WARN 5012 --- [TruckAiReimburse] [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 999ab855-84d3-4275-85b1-d06c98a9d7db
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-01-16T03:33:13.330+05:30  INFO 5012 --- [TruckAiReimburse] [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-01-16T03:33:13.492+05:30 DEBUG 5012 --- [TruckAiReimburse] [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with filters: DisableEncodeUrlFilter, WebAsyncManagerIntegrationFilter, SecurityContextHolderFilter, HeaderWriterFilter, CorsFilter, LogoutFilter, RequestCacheAwareFilter, SecurityContextHolderAwareRequestFilter, AnonymousAuthenticationFilter, ExceptionTranslationFilter, AuthorizationFilter
+2026-01-16T03:33:13.900+05:30  INFO 5012 --- [TruckAiReimburse] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8081 (http) with context path '/'
+2026-01-16T03:33:13.909+05:30  INFO 5012 --- [TruckAiReimburse] [main] c.a.t.TruckAiReimburseApplication        : Started TruckAiReimburseApplication in 10.454 seconds (process running for 11.038)
+2026-01-16T03:43:58.884+05:30  INFO 5012 --- [TruckAiReimburse] [http-nio-8081-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-16T03:43:58.910+05:30  INFO 5012 --- [TruckAiReimburse] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-01-16T03:43:59.013+05:30  INFO 5012 --- [TruckAiReimburse] [http-nio-8081-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 102 ms
+2026-01-16T03:43:59.137+05:30 DEBUG 5012 --- [TruckAiReimburse] [http-nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Securing GET /api/drivers/getAll
+2026-01-16T03:43:59.187+05:30 DEBUG 5012 --- [TruckAiReimburse] [http-nio-8081-exec-2] o.s.security.web.FilterChainProxy        : Secured GET /api/drivers/getAll
+2026-01-16T03:44:00.088+05:30 DEBUG 5012 --- [TruckAiReimburse] [http-nio-8081-exec-2] o.s.s.w.a.AnonymousAuthenticationFilter  : Set SecurityContextHolder to anonymous SecurityContext

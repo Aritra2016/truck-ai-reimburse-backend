@@ -6,22 +6,19 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "destinations")
 public class Destination {
 
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
-
     private Long tripId;
-
     private String name;       // A / B / C / D
     private Integer sequence;  // 1,2,3,4
 
     @Enumerated(EnumType.STRING)
     private DestinationStatus status;
-
-
     private LocalDateTime arrivedAt;
     private LocalDateTime verifiedAt;
 
