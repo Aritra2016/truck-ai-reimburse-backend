@@ -1,5 +1,6 @@
 package com.aritra.truck_ai_reimburse.Domain;
 
+import com.aritra.truck_ai_reimburse.enums.OcrStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,14 +16,20 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String expenseType; // FUEL, TOLL, LUMPER, MAINTENANCE
+    private String expenseType;
     private BigDecimal amount;
     private String currency;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Trip trip;
+    @JoinColumn(name = "reimbursement_id")
+    private Reimbursement reimbursement;
+
     private LocalDateTime expenseDate;
     private boolean approved;
+
+    // ✅ ADD THIS
+    @Enumerated(EnumType.STRING)
+    private OcrStatus ocrStatus;
 
     public Long getId() {
         return id;
@@ -30,6 +37,14 @@ public class Expense {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public OcrStatus getOcrStatus() {
+        return ocrStatus;
+    }
+
+    public void setOcrStatus(OcrStatus ocrStatus) {
+        this.ocrStatus = ocrStatus;
     }
 
     public String getExpenseType() {
@@ -56,12 +71,12 @@ public class Expense {
         this.currency = currency;
     }
 
-    public Trip getTrip() {
-        return trip;
+    public Reimbursement getReimbursement() {
+        return reimbursement;
     }
 
-    public void setTrip(Trip trip) {
-        this.trip = trip;
+    public void setReimbursement(Reimbursement reimbursement) {
+        this.reimbursement = reimbursement;
     }
 
     public LocalDateTime getExpenseDate() {

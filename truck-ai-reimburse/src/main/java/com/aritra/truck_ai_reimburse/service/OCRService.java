@@ -27,16 +27,16 @@ public class OCRService {
         try {
             File tempFile = File.createTempFile("ocr-", file.getOriginalFilename());
             file.transferTo(tempFile);
-
             String text = tesseract.doOCR(tempFile);
             tempFile.delete();
-
             log.info("OCR extracted text:\n{}", text);
             return text;
-
         } catch (Exception e) {
             log.error("OCR failed", e);
-            return "";
+            return "OCR failed: " + e.getMessage();
         }
+    }
+    public String extractRawText(MultipartFile file) {
+        return extractText(file);
     }
 }
