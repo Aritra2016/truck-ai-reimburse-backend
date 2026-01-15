@@ -6,6 +6,7 @@ public enum TripStatus {
     ASSIGNED,
     IN_PROGRESS,
     COMPLETED,
+    PAYOUT_INITIATED,
     POD_UPLOADED,
     POD_VERIFIED,
     PAY_CALCULATED,

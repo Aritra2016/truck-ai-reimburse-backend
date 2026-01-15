@@ -1,6 +1,7 @@
 package com.aritra.truck_ai_reimburse.Domain;
 
 import com.aritra.truck_ai_reimburse.enums.TripStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,16 +13,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Trip {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long trip_id;
+    @Column(name = "id")
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String tripNumber;
 
-    // Driver Mapping
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
@@ -34,9 +36,8 @@ public class Trip {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TripStatus tripstatus;
-    private  String status;
-    // PLANNED, IN_TRANSIT, COMPLETED
+    private TripStatus status;
+
     private BigDecimal totalAmount;
 
     public BigDecimal getTotalAmount() {
@@ -47,21 +48,7 @@ public class Trip {
         this.totalAmount = totalAmount;
     }
 
-    public Long getTrip_id() {
-        return trip_id;
-    }
 
-    public void setTrip_id(Long trip_id) {
-        this.trip_id = trip_id;
-    }
-
-    public TripStatus getTripstatus() {
-        return tripstatus;
-    }
-
-    public void setTripstatus(TripStatus tripstatus) {
-        this.tripstatus = tripstatus;
-    }
 
     public String getTripNumber() {
         return tripNumber;
@@ -111,11 +98,19 @@ public class Trip {
         this.deliveryTime = deliveryTime;
     }
 
-    public String getStatus() {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public TripStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(TripStatus status) {
         this.status = status;
     }
 }

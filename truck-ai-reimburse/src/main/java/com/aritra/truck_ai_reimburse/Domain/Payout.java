@@ -1,5 +1,6 @@
 package com.aritra.truck_ai_reimburse.Domain;
 
+import com.aritra.truck_ai_reimburse.enums.PayoutStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,9 +17,17 @@ public class Payout {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    public void setStatus(PayoutStatus status) {
+        this.status = status;
+    }
+
     private String payoutRef;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id",nullable = false)
     private Driver driver;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id")
     private Trip trip;
@@ -26,13 +35,18 @@ public class Payout {
     private BigDecimal amount;
     private String currency;
     private String payoutMethod; // ACH, RTP, CARD, EFT
-    private String status; // INITIATED, SUCCESS, FAILED
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PayoutStatus status;
+
     private LocalDateTime processedAt;
     private String transactionRef;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pay_statement_id", nullable = false)
     private PayStatement payStatement;
+
 
     public Trip getTrip() {
         return trip;
@@ -106,13 +120,13 @@ public class Payout {
         this.payoutMethod = payoutMethod;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+//    public String getStatus() {
+//        return status;
+//    }
+//
+//    public void setStatus(String status) {
+//        this.status = status;
+//    }
 
     public LocalDateTime getProcessedAt() {
         return processedAt;

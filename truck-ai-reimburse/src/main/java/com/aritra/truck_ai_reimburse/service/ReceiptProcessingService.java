@@ -69,7 +69,7 @@ public class ReceiptProcessingService {
 
         // Optional auto-pay trigger
         if (receipt.isVerified()) {
-            payCalculationService.calculatePay(trip.getTrip_id());
+            payCalculationService.calculatePay(trip.getId());
         }
 
         return receipt;
@@ -82,7 +82,7 @@ public class ReceiptProcessingService {
                 .orElseThrow(() -> new RuntimeException("Expense not found"));
 
         Trip trip = expense.getTrip();
-        if (trip.getStatus() != (String.valueOf((TripStatus.COMPLETED))) ) {
+        if (trip.getStatus() != TripStatus.COMPLETED ) {
             throw new IllegalStateException("Trip not completed");
         }
 
@@ -99,7 +99,7 @@ public class ReceiptProcessingService {
 
         receiptRepository.save(receipt);
 
-        trip.setStatus(String.valueOf(TripStatus.POD_UPLOADED));
+        trip.setStatus(TripStatus.POD_UPLOADED);
 
         ledgerService.recordEvent(
                 trip,

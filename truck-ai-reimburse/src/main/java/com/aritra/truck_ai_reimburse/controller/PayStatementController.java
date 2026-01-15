@@ -16,8 +16,8 @@ public class PayStatementController {
 
     private final PayCalculationService payCalculationService;
 
-    @PostMapping("/calculate")
+    @PostMapping("/create")
     public PayStatement calculatePay(@RequestBody Trip trip) {
-        return payCalculationService.calculatePay(trip.getTrip_id());
+        return payCalculationService.calculatePay(trip.getId());
     }
 }

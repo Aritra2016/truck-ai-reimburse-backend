@@ -1,6 +1,8 @@
 package com.aritra.truck_ai_reimburse.Domain;
 
 
+import com.aritra.truck_ai_reimburse.enums.DisputeStatus;
+import com.aritra.truck_ai_reimburse.enums.DisputeType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,14 +20,22 @@ public class Dispute {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String disputeType; // PAY, EXPENSE, DETENTION
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DisputeType disputeType; // PAY, EXPENSE, DETENTION
+
     @Column(columnDefinition = "TEXT")
     private String reason;
-    private String status; // OPEN, IN_PROGRESS, RESOLVED
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DisputeStatus status; // OPEN, IN_PROGRESS, RESOLVED
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "driver_id")
+    @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
 
     private LocalDateTime createdAt;
+
 }

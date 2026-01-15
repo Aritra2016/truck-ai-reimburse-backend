@@ -1,5 +1,6 @@
 package com.aritra.truck_ai_reimburse.Domain;
 
+import com.aritra.truck_ai_reimburse.enums.PayStatementStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
@@ -14,8 +15,10 @@ public class PayStatement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long payId;
+    @Column(name = "id")
+    private Long id;
 
+    @Column(nullable = false, unique = true)
     private String statementNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,24 +26,45 @@ public class PayStatement {
     private Driver driver;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "trip_id", nullable = false)   // ✅ FIX HERE
+    @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
+
     private BigDecimal grossPay;
     private BigDecimal deductions;
     private BigDecimal netPay;
-    private LocalDateTime generatedAt;
-    private BigDecimal totalAmount;
-    private String status;
 
-
-
-    public String getStatus() {
+    public PayStatementStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    @Column(nullable = false)
+    private BigDecimal totalAmount;
+
+    private LocalDateTime generatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PayStatementStatus status;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setStatus(PayStatementStatus status) {
         this.status = status;
     }
+
+//    public String getStatus() {
+//        return status;
+//    }
+//
+//    public void setStatus(String status) {
+//        this.status = status;
+//    }
 
     public BigDecimal getTotalAmount() {
         return totalAmount;
@@ -48,15 +72,6 @@ public class PayStatement {
 
     public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
-    }
-
-
-    public Long getPayId() {
-        return payId;
-    }
-
-    public void setPayId(Long payId) {
-        this.payId = payId;
     }
 
     public String getStatementNumber() {

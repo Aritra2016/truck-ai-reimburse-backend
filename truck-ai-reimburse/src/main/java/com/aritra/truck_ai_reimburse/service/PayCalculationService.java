@@ -3,6 +3,7 @@ package com.aritra.truck_ai_reimburse.service;
 import com.aritra.truck_ai_reimburse.Domain.LedgerEvents;
 import com.aritra.truck_ai_reimburse.Domain.PayStatement;
 import com.aritra.truck_ai_reimburse.Domain.Trip;
+import com.aritra.truck_ai_reimburse.enums.PayStatementStatus;
 import com.aritra.truck_ai_reimburse.enums.TripStatus;
 import com.aritra.truck_ai_reimburse.repository.ExpenseRepository;
 import com.aritra.truck_ai_reimburse.repository.PayRuleRepository;
@@ -45,7 +46,7 @@ public class PayCalculationService {
         Trip trip = tripRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Trip not found"));
 
-        if (trip.getStatus() != String.valueOf(TripStatus.POD_VERIFIED)) {
+        if (trip.getStatus() != TripStatus.POD_VERIFIED) {
             throw new IllegalStateException("POD not verified");
         }
 
@@ -55,12 +56,12 @@ public class PayCalculationService {
         PayStatement statement = PayStatement.builder()
                 .trip(trip)
                 .totalAmount(totalPay)
-                .status("CALCULATED")
+                .status(PayStatementStatus.CALCULATED)
                 .build();
 
         payStatementRepository.save(statement);
 
-        trip.setStatus(String.valueOf(TripStatus.PAY_CALCULATED));
+        trip.setStatus(TripStatus.PAY_CALCULATED);
         tripRepository.save(trip);
 
         ledgerService.recordEvent(

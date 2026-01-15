@@ -9,6 +9,10 @@ import java.util.Optional;
 public interface TripRepository extends JpaRepository<Trip,Long> {
 
     Optional<Trip> findByTripNumber(String tripNumber);
-    List<Trip> findByStatus(String status);
-    List<Trip> findByDriverId(Long driverId);
+      List<Trip> findByStatus(String status);
+//    List<Trip> findByDriverId(Long driverId);
+//
+        List<Trip> findByDriver_Id(Long driverId);
+
+   // List<Trip> findByDriver_Driver_id(Long driverId);
 }
