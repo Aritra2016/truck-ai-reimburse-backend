@@ -40,36 +40,59 @@ public class BillExtractionService {
     }
 
     public BigDecimal extractFinalAmount(String text) {
-
         String normalized = text
                 .replaceAll(",", "")
                 .toLowerCase();
 
-        Pattern pattern = Pattern.compile(
-                "(total amount|grand total|amount paid|net amount|fuel total)\\s*[:\\-]?\\s*([$₹]?\\s*[0-9]+(\\.[0-9]{1,2})?)"
+        // 1️⃣ STRONG PRIORITY: TOTAL AMOUNT
+        Pattern totalAmountPattern = Pattern.compile(
+                "(total amount)\\s*[:\\-]?\\s*([$₹]?\\s*[0-9]+(\\.[0-9]{1,2})?)"
         );
 
-        Matcher matcher = pattern.matcher(normalized);
-
-        if (matcher.find()) {
-
-            String amountStr = matcher.group(2)
-                    .replaceAll("[^0-9.]", "");
-
-            BigDecimal amount = new BigDecimal(amountStr);
-
-            // ✅ SANITY CHECK — PLACE IT HERE
-            if (amount.compareTo(new BigDecimal("10000")) > 0) {
-                throw new BusinessException(
-                        "Suspicious amount detected: " + amount
-                );
-            }
-
-            return amount;
+        Matcher totalMatcher = totalAmountPattern.matcher(normalized);
+        if (totalMatcher.find()) {
+            return parseAndValidateAmount(totalMatcher.group(2));
         }
 
+        // 2️⃣ FALLBACKS (only if TOTAL AMOUNT not present)
+        Pattern fallbackPattern = Pattern.compile(
+                "(grand total|amount paid|net amount)\\s*[:\\-]?\\s*([$₹]?\\s*[0-9]+(\\.[0-9]{1,2})?)"
+        );
 
-        throw new BusinessException("Valid total amount not found in bill");
+        Matcher fallbackMatcher = fallbackPattern.matcher(normalized);
+        if (fallbackMatcher.find()) {
+            return parseAndValidateAmount(fallbackMatcher.group(2));
+        }
+
+        // 3️⃣ LAST RESORT (fuel total ONLY if nothing else exists)
+        Pattern fuelTotalPattern = Pattern.compile(
+                "(fuel total)\\s*[:\\-]?\\s*([$₹]?\\s*[0-9]+(\\.[0-9]{1,2})?)"
+        );
+
+        Matcher fuelMatcher = fuelTotalPattern.matcher(normalized);
+        if (fuelMatcher.find()) {
+            return parseAndValidateAmount(fuelMatcher.group(2));
+        }
+
+        throw new BusinessException("Final payable amount not found in bill");
+
+    }
+
+    // ✅ THIS IS THE MISSING METHOD (ADD THIS)
+    private BigDecimal parseAndValidateAmount(String rawAmount) {
+
+        String amountStr = rawAmount.replaceAll("[^0-9.]", "");
+        BigDecimal amount = new BigDecimal(amountStr);
+
+        // 🚨 Sanity check
+        if (amount.compareTo(new BigDecimal("10000")) > 0) {
+            throw new BusinessException(
+                    "Suspicious amount detected: " + amount
+            );
+        }
+
+        return amount;
+
     }
 }
 
