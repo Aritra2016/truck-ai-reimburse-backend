@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/destinations")
 public class DestinationController {
     private final DestinationService destinationService;
+
     public DestinationController(DestinationService destinationService) {
         this.destinationService = destinationService;
     }

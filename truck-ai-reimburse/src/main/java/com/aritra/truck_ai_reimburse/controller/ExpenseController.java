@@ -1,5 +1,6 @@
 package com.aritra.truck_ai_reimburse.controller;
 
+import com.aritra.truck_ai_reimburse.DTOs.ExpenseUploadDTO;
 import com.aritra.truck_ai_reimburse.Domain.Expense;
 import com.aritra.truck_ai_reimburse.service.ExpenseService;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +27,14 @@ public class ExpenseController {
             @RequestParam String expenseType,
             @RequestParam MultipartFile file
     ) {
+         ExpenseUploadDTO dto = new ExpenseUploadDTO();
+        dto.setReimbursementId(reimbursementId);
+        dto.setExpenseType(expenseType);
+        dto.setFile(file);
+
+        // ✅ Service এ শুধু DTO পাঠাও
         return ResponseEntity.ok(
-                expenseService.uploadExpense(
-                        reimbursementId,
-                        expenseType,
-                        file
-                )
+                expenseService.uploadExpense(dto)
         );
     }
 

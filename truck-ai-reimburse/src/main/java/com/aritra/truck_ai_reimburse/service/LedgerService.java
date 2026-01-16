@@ -5,5 +5,8 @@ import org.springframework.stereotype.Service;
 
 
 public interface LedgerService {
-    void recordEvent(Trip trip, String eventType, String eventDetails, String remarks);
+    void recordEvent(Trip trip,
+                     String eventType,
+                     String eventDetails,
+                     String remarks);
 }

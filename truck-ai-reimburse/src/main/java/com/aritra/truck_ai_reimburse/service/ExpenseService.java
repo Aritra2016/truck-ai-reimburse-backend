@@ -1,8 +1,11 @@
 package com.aritra.truck_ai_reimburse.service;
 
+import com.aritra.truck_ai_reimburse.DTOs.ExpenseUploadDTO;
+import com.aritra.truck_ai_reimburse.Domain.Destination;
 import com.aritra.truck_ai_reimburse.Domain.Expense;
 import com.aritra.truck_ai_reimburse.Domain.Reimbursement;
 import com.aritra.truck_ai_reimburse.Interpreter.ExpenseOcrInterpreter;
+import com.aritra.truck_ai_reimburse.enums.DestinationStatus;
 import com.aritra.truck_ai_reimburse.enums.OcrStatus;
 import com.aritra.truck_ai_reimburse.enums.ReimbursementStatus;
 import com.aritra.truck_ai_reimburse.exception.BusinessException;
@@ -22,56 +25,73 @@ import java.util.List;
 public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
-    private final OCRService ocrService;
-    private final ExpenseOcrInterpreter expenseOcrInterpreter;
-    private final ReimbursementService reimbursementService;
-    public ExpenseService(ExpenseRepository expenseRepository, OCRService ocrService, ExpenseOcrInterpreter expenseOcrInterpreter, ReimbursementService reimbursementService) {
+
+    private final DestinationService destinationService;
+
+    public ExpenseService(ExpenseRepository expenseRepository, OCRService ocrService, ExpenseOcrInterpreter expenseOcrInterpreter, ReimbursementService reimbursementService, DestinationService destinationService) {
         this.expenseRepository = expenseRepository;
-        this.ocrService = ocrService;
-        this.expenseOcrInterpreter = expenseOcrInterpreter;
-        this.reimbursementService = reimbursementService;
+        this.destinationService = destinationService;
     }
+//    Upload expense document and process OCR
+//    public Expense uploadExpense(
+//            Long reimbursementId,
+//            String expenseType,
+//            MultipartFile file
+//    ) {
+//        Reimbursement reimbursement =
+//                reimbursementService.getById(reimbursementId);
+//        if (reimbursement.getStatus() != ReimbursementStatus.DRAFT) {
+//            throw new BusinessException(
+//                    "Expenses can be uploaded only in DRAFT reimbursement state"
+//            );
+//        }
+//        //  OCR raw text
+//        String rawText = ocrService.extractRawText(file);
+//        // Interpret OCR text
+//        BigDecimal amount =
+//                expenseOcrInterpreter.extractAmount(rawText);
+//        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+//            throw new BusinessException("Unable to extract valid amount from expense");
+//        }
+//        Expense expense = Expense.builder()
+//                .type(expenseType)
+//                .amount(amount)
+//                .currency("INR")
+//                .reimbursement(reimbursement)
+//                .expenseDate(LocalDateTime.now())
+//                .approved(false)
+//                .ocrStatus(OcrStatus.VERIFIED)
+//                .build();
+//        Expense savedExpense = expenseRepository.save(expense);
+//        reimbursementService.recalculateTotal(reimbursementId);
+//        return savedExpense;
+//    }
 
-    /**
-     * Upload expense document and process OCR
-     */
-    public Expense uploadExpense(
-            Long reimbursementId,
-            String expenseType,
-            MultipartFile file
-    ) {
-
-        Reimbursement reimbursement =
-                reimbursementService.getById(reimbursementId);
-
-        if (reimbursement.getStatus() != ReimbursementStatus.DRAFT) {
+    public Expense uploadExpense(ExpenseUploadDTO dto) {
+        Destination current =
+                destinationService.getCurrentDestination(dto.getTripId());
+        if (current == null ||
+                current.getStatus() != DestinationStatus.VERIFIED) {
             throw new BusinessException(
-                    "Expenses can be uploaded only in DRAFT reimbursement state"
+                    "Upload Proof of Arrival before expenses"
             );
         }
-        // 1️⃣ OCR raw text
-        String rawText = ocrService.extractRawText(file);
-        // 2️⃣ Interpret OCR text
-        BigDecimal amount =
-                expenseOcrInterpreter.extractAmount(rawText);
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("Unable to extract valid amount from expense");
-        }
-        // 3️⃣ Build Expense entity
         Expense expense = Expense.builder()
-                .expenseType(expenseType)
-                .amount(amount)
+                .type(dto.getExpenseType())
+                .amount(dto.getAmount())
                 .currency("INR")
-                .reimbursement(reimbursement)
+                .reimbursement(
+                        reimbursementService.getById(dto.getReimbursementId())
+                )
                 .expenseDate(LocalDateTime.now())
                 .approved(false)
                 .ocrStatus(OcrStatus.VERIFIED)
                 .build();
-        Expense savedExpense = expenseRepository.save(expense);
-        // 4️⃣ Recalculate reimbursement total
-        reimbursementService.recalculateTotal(reimbursementId);
 
-        return savedExpense;
+        Expense saved = expenseRepository.save(expense);
+        reimbursementService.recalculateTotal(dto.getReimbursementId());
+
+        return saved;
     }
 
     /**
