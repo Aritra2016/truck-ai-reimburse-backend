@@ -20,15 +20,17 @@ public class TripService {
     private final TripRepository tripRepository;
     private final DriverRepository driverRepository;
     private final LedgerService ledgerService;
+    private final DestinationService destinationService;
 
     public TripService(
             TripRepository tripRepository,
             DriverRepository driverRepository,
-            LedgerService ledgerService
+            LedgerService ledgerService, DestinationService destinationService
     ) {
         this.tripRepository = tripRepository;
         this.driverRepository = driverRepository;
         this.ledgerService = ledgerService;
+        this.destinationService = destinationService;
     }
 
 //    @Transactional
@@ -60,22 +62,40 @@ public class TripService {
     @Transactional
     public Trip createTrip(CreateTripRequestDTO dto) {
 
+        // STEP 1️⃣ Fetch Driver (Repository → Entity)
         Driver driver = driverRepository.findById(dto.getDriverId())
                 .orElseThrow(() ->
-                        new RuntimeException("Driver not found with id " + dto.getDriverId())
+                        new RuntimeException(
+                                "Driver not found with id " + dto.getDriverId()
+                        )
                 );
 
-        Trip trip = Trip.builder()
-                .tripNumber(dto.getTripNumber())
-                .driver(driver)
-                .origin(dto.getOrigin())
-                .destination(dto.getDestination())
-                .pickupTime(dto.getPickupTime())
-                .totalAmount(dto.getTotalAmount())
-                .status(TripStatus.CREATED)
-                .build();
+        // STEP 2️⃣ Create Trip & set Driver ENTITY
+        Trip trip = new Trip();
+        trip.setTripNumber(dto.getTripNumber());
+        trip.setDriver(driver);                 // ✅ FIX HERE
+        trip.setOrigin(dto.getOrigin());
+        trip.setDestination(dto.getDestination());
+        trip.setPickupTime(dto.getPickupTime());
+        trip.setTotalAmount(dto.getTotalAmount());
+        trip.setStatus(TripStatus.CREATED);
 
-        return tripRepository.save(trip);
+        // STEP 3️⃣ Save Trip
+        trip = tripRepository.save(trip);
+
+        // STEP 4️⃣ Resolve stops (OPTION-2)
+        List<String> routeStops =
+                dto.getStops() != null && !dto.getStops().isEmpty()
+                        ? dto.getStops()
+                        : List.of(dto.getOrigin(), dto.getDestination());
+
+        // STEP 5️⃣ Create Destinations
+        destinationService.createDestinations(
+                trip.getId(),
+                routeStops
+        );
+
+        return trip;
     }
 
     @Transactional

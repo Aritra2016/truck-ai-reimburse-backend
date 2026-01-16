@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,4 +19,6 @@ public class CreateTripRequestDTO {
     private String destination;
     private LocalDateTime pickupTime;
     private BigDecimal totalAmount;
+
+    private List<String> stops;
 }

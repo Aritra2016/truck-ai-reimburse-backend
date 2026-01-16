@@ -20,24 +20,17 @@ public class Trip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-
     @Column(nullable = false, unique = true)
     private String tripNumber;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id", nullable = false)
     private Driver driver;
-
     private String origin;
     private String destination;
-
     private LocalDateTime pickupTime;
     private LocalDateTime deliveryTime;
-
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private TripStatus status;
-
     private BigDecimal totalAmount;
 
     public BigDecimal getTotalAmount() {
