@@ -3,6 +3,8 @@ package com.aritra.truck_ai_reimburse.service;
 import com.aritra.truck_ai_reimburse.DTOs.ChatMessageDTO;
 import com.aritra.truck_ai_reimburse.Domain.ChatRequest;
 import com.aritra.truck_ai_reimburse.Domain.ChatResponse;
+import com.aritra.truck_ai_reimburse.Domain.InterpretedBill;
+import com.aritra.truck_ai_reimburse.Interpreter.PodOcrInterpreter;
 import com.aritra.truck_ai_reimburse.enums.ChatIntent;
 import com.aritra.truck_ai_reimburse.exception.DocumentProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -21,65 +23,83 @@ import java.util.UUID;
 public class ChatbotService {
 
     private final OCRService ocrService;
-    private final BillExtractionService billExtractionService;
     private final PdfTextService pdfTextService;
+    private final PodOcrInterpreter podOcrInterpreter; // ⭐ KEY DEPENDENCY
 
+    /* -------------------------------
+       TEXT MESSAGE HANDLING
+    -------------------------------- */
     public ChatResponse processMessage(ChatRequest request) {
-        // 1. Generate sessionId if missing
+
+        if (request == null || request.getMessage() == null) {
+            return new ChatResponse(
+                    null,
+                    "Invalid request",
+                    ChatIntent.NONE.name()
+            );
+        }
+
         String sessionId = request.getSessionId();
         if (sessionId == null || sessionId.isBlank()) {
             sessionId = UUID.randomUUID().toString();
             log.info("New session created: {}", sessionId);
         }
-        //
-        if (request == null || request.getMessage() == null) {
-            return new ChatResponse(
-                    request != null ? request.getSessionId() : null,
-                    "Invalid request",
-                    "NONE"
-            );
-        }
-        log.info("Chatbot message received: {}", request.getMessage());
+
         String message = request.getMessage().toLowerCase();
+        log.info("Chatbot message received: {}", message);
+
         if (message.contains("pay")) {
             return new ChatResponse(
-                    request.getSessionId(),
+                    sessionId,
                     "Your last trip pay is being processed.",
-                    "NONE"
+                    ChatIntent.NONE.name()
             );
         }
+
         if (message.contains("trip is done") || message.contains("trip completed")) {
             return new ChatResponse(
-                    request.getSessionId(),
+                    sessionId,
                     "Please upload your expense receipts.",
-                    "UPLOAD_BILL"
+                    ChatIntent.UPLOAD_BILL.name()
             );
         }
 
         return new ChatResponse(
-                request.getSessionId(),
+                sessionId,
                 "Sorry, I didn’t understand your request.",
-                "NONE"
+                ChatIntent.NONE.name()
         );
     }
-    public ChatResponse processBillUpload(MultipartFile file, String sessionId) throws DocumentProcessingException {
+
+    /* -------------------------------
+       BILL / RECEIPT UPLOAD HANDLING
+    -------------------------------- */
+    public ChatResponse processBillUpload(MultipartFile file, String sessionId)
+            throws DocumentProcessingException {
+
         if (sessionId == null || sessionId.isBlank()) {
             sessionId = UUID.randomUUID().toString();
+        }
+
+        if (file == null || file.isEmpty()) {
+            throw new DocumentProcessingException("Uploaded file is empty");
         }
 
         String filename = file.getOriginalFilename();
         if (filename == null) {
             throw new DocumentProcessingException("Invalid file");
         }
+
         filename = filename.toLowerCase();
 
-        if (!filename.endsWith(".jpg") &&
-                !filename.endsWith(".jpeg") &&
-                !filename.endsWith(".png") &&
-                !filename.endsWith(".pdf")) {
+        if (!filename.endsWith(".jpg")
+                && !filename.endsWith(".jpeg")
+                && !filename.endsWith(".png")
+                && !filename.endsWith(".pdf")) {
             throw new DocumentProcessingException("Unsupported file type");
         }
 
+        // 🔹 Step 1: Extract raw text (OCR / PDF)
         String extractedText;
         if (filename.endsWith(".pdf")) {
             extractedText = pdfTextService.extractText(file);
@@ -91,32 +111,31 @@ public class ChatbotService {
             throw new DocumentProcessingException("No readable text found in document");
         }
 
-        log.info("===== OCR / PDF TEXT =====");
+        log.info("===== EXTRACTED DOCUMENT TEXT =====");
         log.info(extractedText);
 
-        Map<String, String> billData =
-                billExtractionService.extractFields(extractedText);
-
-        if (billData.isEmpty()
-                || billData.get("amount") == null
-                || billData.get("category") == null) {
-
+        // 🔹 Step 2: Interpret bill (AMOUNT + CURRENCY + INR CONVERSION)
+        InterpretedBill bill;
+        try {
+            bill = podOcrInterpreter.interpret(extractedText);
+        } catch (Exception ex) {
+            log.error("Bill interpretation failed", ex);
             return new ChatResponse(
                     sessionId,
-                    " This document does not look like a valid expense receipt. " +
+                    "This document does not look like a valid expense receipt. " +
                             "Please upload a fuel, toll, or parking bill with a visible amount.",
-                    "UPLOAD_AGAIN"
+                    ChatIntent.UPLOAD_AGAIN.name()
             );
         }
 
+        // 🔹 Step 3: Respond to chatbot with FINAL normalized data
         return new ChatResponse(
                 sessionId,
-                "I found a " + billData.get("category") +
-                        " expense of ₹" + billData.get("amount") +
-                        ". Please confirm.",
-                "CONFIRM_BILL"
+                "I found a " + bill.getCategory() +
+                        " expense of " + bill.getCurrency() + " " +
+                        bill.getAmount() +
+                        " (₹" + bill.getAmountInINR() + "). Please confirm.",
+                ChatIntent.CONFIRM_BILL.name()
         );
-
-        }
-
+    }
     }

@@ -1,7 +1,9 @@
 package com.aritra.truck_ai_reimburse.service;
 
+import com.aritra.truck_ai_reimburse.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -36,4 +38,38 @@ public class BillExtractionService {
 
         return data;
     }
+
+    public BigDecimal extractFinalAmount(String text) {
+
+        String normalized = text
+                .replaceAll(",", "")
+                .toLowerCase();
+
+        Pattern pattern = Pattern.compile(
+                "(total amount|grand total|amount paid|net amount|fuel total)\\s*[:\\-]?\\s*([$₹]?\\s*[0-9]+(\\.[0-9]{1,2})?)"
+        );
+
+        Matcher matcher = pattern.matcher(normalized);
+
+        if (matcher.find()) {
+
+            String amountStr = matcher.group(2)
+                    .replaceAll("[^0-9.]", "");
+
+            BigDecimal amount = new BigDecimal(amountStr);
+
+            // ✅ SANITY CHECK — PLACE IT HERE
+            if (amount.compareTo(new BigDecimal("10000")) > 0) {
+                throw new BusinessException(
+                        "Suspicious amount detected: " + amount
+                );
+            }
+
+            return amount;
+        }
+
+
+        throw new BusinessException("Valid total amount not found in bill");
+    }
 }
+
