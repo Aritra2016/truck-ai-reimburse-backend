@@ -1,9 +1,15 @@
 package com.aritra.truck_ai_reimburse.enums;
 
 public enum ChatIntent {
-    NONE,          // No action expected
-    UPLOAD_BILL,   // Ask user to upload a receipt
-    UPLOAD_AGAIN,  // Invalid receipt, retry upload
-    CONFIRM_BILL,  // Ask user to confirm extracted bill
-    PAYOUT_READY
+    NONE,                   // No action
+    TRIP_COMPLETED,         // Driver says trip completed
+    UPLOAD_POD,             // Ask for POD upload
+    POD_VERIFIED,           // POD verified successfully
+    POD_FAILED,             // POD invalid
+    UPLOAD_EXPENSE,         // Upload reimbursement bills
+    CONFIRM_EXPENSE,        // Confirm extracted bill
+    ALL_DOCS_UPLOADED,      // User says all docs uploaded
+    UPLOAD_BILL, PAYOUT_READY  ,
+    UPLOAD_AGAIN ,// Reimbursement ready
+    CONFIRM_BILL
 }

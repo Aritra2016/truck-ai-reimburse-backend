@@ -1,5 +1,8 @@
 package com.aritra.truck_ai_reimburse.service;
 
+import com.aritra.truck_ai_reimburse.Domain.CurrencyDetector;
+import com.aritra.truck_ai_reimburse.Domain.InterpretedBill;
+import com.aritra.truck_ai_reimburse.enums.ExpenseCategory;
 import com.aritra.truck_ai_reimburse.exception.BusinessException;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +14,14 @@ import java.util.regex.Pattern;
 
 @Service
 public class BillExtractionService {
+
+    private final CurrencyDetector currencyDetector;
+    private final CurrencyConversionService conversionService;
+
+    public BillExtractionService(CurrencyDetector currencyDetector, CurrencyConversionService conversionService) {
+        this.currencyDetector = currencyDetector;
+        this.conversionService = conversionService;
+    }
 
     public Map<String, String> extractFields(String text) {
 
@@ -77,6 +88,27 @@ public class BillExtractionService {
         throw new BusinessException("Final payable amount not found in bill");
 
     }
+
+    public InterpretedBill interpret(String ocrText) {
+
+        String currency = currencyDetector.detectCurrency(ocrText);
+
+        // ✅ FIXED: call local method, not self-injected bean
+        BigDecimal amount = extractFinalAmount(ocrText);
+
+        BigDecimal amountInINR =
+                conversionService.convertToINR(amount, currency);
+
+        ExpenseCategory category = ExpenseCategory.FUEL;
+
+        return new InterpretedBill(
+                category,
+                amount,
+                currency,
+                amountInINR
+        );
+    }
+
 
     // ✅ THIS IS THE MISSING METHOD (ADD THIS)
     private BigDecimal parseAndValidateAmount(String rawAmount) {

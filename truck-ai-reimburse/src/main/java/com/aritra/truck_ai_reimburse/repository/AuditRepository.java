@@ -10,4 +10,6 @@ public interface AuditRepository extends JpaRepository<AuditLog, Long> {
     List<AuditLog> findByEntityNameAndEntityId(String entityName, String entityId);
 
     List<AuditLog> findByPerformedBy(String performedBy);
+
+
 }
