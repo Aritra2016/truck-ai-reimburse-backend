@@ -21,6 +21,7 @@ public class ExpenseBill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     private String sessionId;
     private String tripId;
 

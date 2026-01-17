@@ -2,6 +2,7 @@ package com.aritra.truck_ai_reimburse.controller;
 
 import com.aritra.truck_ai_reimburse.DTOs.ExpenseBillUploadResponseDTO;
 import com.aritra.truck_ai_reimburse.DTOs.ExpenseConfirmationDTO;
+import com.aritra.truck_ai_reimburse.Domain.ChatResponse;
 import com.aritra.truck_ai_reimburse.Domain.ExpenseBill;
 import com.aritra.truck_ai_reimburse.Domain.InterpretedBill;
 import com.aritra.truck_ai_reimburse.Interpreter.PodOcrInterpreter;
@@ -77,5 +78,13 @@ public class ExpenseController {
                 dto.getExpenseBillId(),
                 dto.isConfirmed()
         );
+    }
+
+
+    @PostMapping("/confirm-latest")
+    public ChatResponse confirmLatestExpense(
+            @RequestParam String sessionId
+    ) {
+        return workflowManager.confirmLatestExpense(sessionId);
     }
 }

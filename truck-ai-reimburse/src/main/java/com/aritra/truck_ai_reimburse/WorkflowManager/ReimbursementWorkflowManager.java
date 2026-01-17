@@ -1,10 +1,13 @@
 package com.aritra.truck_ai_reimburse.WorkflowManager;
 
+import com.aritra.truck_ai_reimburse.Domain.ChatResponse;
+import com.aritra.truck_ai_reimburse.Domain.ExpenseBill;
 import com.aritra.truck_ai_reimburse.Domain.ReimbursementSession;
 import com.aritra.truck_ai_reimburse.enums.ReimbursementStatus;
 import com.aritra.truck_ai_reimburse.exception.BusinessException;
 import com.aritra.truck_ai_reimburse.repository.ExpenseBillRepository;
 import com.aritra.truck_ai_reimburse.repository.PodRepository;
+import com.aritra.truck_ai_reimburse.service.ExpenseBillService;
 import com.aritra.truck_ai_reimburse.service.ReimbursementFinalizationService;
 import com.aritra.truck_ai_reimburse.service.ReimbursementSessionService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ public class ReimbursementWorkflowManager {
     private final PodRepository podRepository;
     private final ExpenseBillRepository expenseBillRepository;
     private final ReimbursementFinalizationService finalizationService;
+    private final ExpenseBillService expenseBillService;
 
     /**
      * STEP 1: Called when driver says "Trip Completed"
@@ -95,4 +99,21 @@ public class ReimbursementWorkflowManager {
         return finalizationService.finalizeReimbursement(session);
     }
 
+
+    /**
+     * Confirm latest unconfirmed expense and return settlement message
+     */
+    public ChatResponse confirmLatestExpense(String sessionId) {
+
+        ExpenseBill bill =
+                expenseBillService.confirmLatestExpense(sessionId);
+
+        String reply =
+                finalizationService.buildSettlementMessage(bill);
+
+        ChatResponse response = new ChatResponse();
+        response.setReply(reply);
+
+        return response;
+    }
 }

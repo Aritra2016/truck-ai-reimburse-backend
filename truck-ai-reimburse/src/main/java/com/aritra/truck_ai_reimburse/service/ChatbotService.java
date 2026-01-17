@@ -71,6 +71,19 @@ public class ChatbotService {
         );
     }
 
+    private ChatIntent detectIntent(String message) {
+
+        if (message.equals("yes")
+                || message.equals("y")
+                || message.equals("confirm")
+                || message.equals("ok")) {
+
+            return ChatIntent.CONFIRM_YES;
+        }
+
+        return ChatIntent.UNKNOWN;
+    }
+
     /* -------------------------------
        BILL / RECEIPT UPLOAD HANDLING
     -------------------------------- */

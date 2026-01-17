@@ -3,6 +3,7 @@ package com.aritra.truck_ai_reimburse.service;
 import com.aritra.truck_ai_reimburse.Domain.AuditLog;
 import com.aritra.truck_ai_reimburse.Domain.ExpenseBill;
 import com.aritra.truck_ai_reimburse.enums.OcrStatus;
+import com.aritra.truck_ai_reimburse.exception.BusinessException;
 import com.aritra.truck_ai_reimburse.repository.AuditRepository;
 import com.aritra.truck_ai_reimburse.repository.ExpenseBillRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,30 @@ public class ExpenseBillService {
                         .performedAt(LocalDateTime.now())
                         .build()
         );
+    }
+
+    // 🔥 NEW METHOD USED BY WORKFLOW MANAGER
+    public ExpenseBill confirmLatestExpense(String sessionId) {
+
+        ExpenseBill bill =
+                expenseBillRepository
+                        .findTopBySessionIdAndConfirmedFalseOrderByIdDesc(sessionId)
+                        .orElseThrow(() ->
+                                new BusinessException("No pending expense found to confirm"));
+
+        bill.setConfirmed(true);
+        ExpenseBill saved = expenseBillRepository.save(bill);
+
+        auditRepository.save(
+                AuditLog.builder()
+                        .entityName("EXPENSE_BILL")
+                        .entityId(saved.getId().toString())
+                        .action("BILL_CONFIRMED")
+                        .performedAt(LocalDateTime.now())
+                        .build()
+        );
+
+        return saved;
     }
 
 

@@ -53,5 +53,14 @@ public class ReimbursementFinalizationService {
         return session;
     }
 
+    public String buildSettlementMessage(ExpenseBill bill) {
 
+        return String.format(
+                "Your %s amount %s %.2f (₹%.2f) will be settled in 2 working days.",
+                bill.getCategory().name(),
+                bill.getCurrency(),
+                bill.getAmount(),
+                bill.getAmountInINR()
+        );
+    }
 }

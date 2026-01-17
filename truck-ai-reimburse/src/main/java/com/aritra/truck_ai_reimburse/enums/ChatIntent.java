@@ -11,5 +11,7 @@ public enum ChatIntent {
     ALL_DOCS_UPLOADED,      // User says all docs uploaded
     UPLOAD_BILL, PAYOUT_READY  ,
     UPLOAD_AGAIN ,// Reimbursement ready
-    CONFIRM_BILL
+    CONFIRM_BILL,
+    CONFIRM_YES,
+    UNKNOWN
 }
